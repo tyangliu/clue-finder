@@ -19,6 +19,15 @@
 :- abolish(myTurn/1).
 :- abolish(exists/1).
 :- abolish(holds/2).
+:- abolish(cantHold/2).
+:- abolish(nobodyHolds/1).
+:- abolish(maybeHolds/2).
+:- abolish(holdsOneOf/2).
+:- abolish(holdsTwoOf/2).
+:- abolish(suggestableCard/1).
+:- abolish(suggestableSet/3).
+:- abolish(accusableSet/3).
+:- abolish(unconfirmedCard/1).
 :- abolish(skip/1).
 
 :- dynamic(suspect/1).
@@ -28,6 +37,15 @@
 :- dynamic(myTurn/1).
 :- dynamic(exists/1).
 :- dynamic(holds/2).
+:- dynamic(cantHold/2).
+:- dynamic(nobodyHolds/1).
+:- dynamic(maybeHolds/2).
+:- dynamic(holdsOneOf/2).
+:- dynamic(holdsTwoOf/2).
+:- dynamic(suggestableCard/1).
+:- dynamic(suggestableSet/3).
+:- dynamic(accusableSet/3).
+:- dynamic(unconfirmedCard/1).
 :- dynamic(skip/1).
 
 %  load logic file
@@ -97,14 +115,15 @@ loadCards(Type) :-
     read(Card),
     ( Card = f -> true;
           % if card is already added, don't add the card
-        ( exists(Card) -> write('You already added this card!');
+        ( exists(Card) -> write('You already added this card!'), loadCards(Type);
           % otherwise, save the card and mark as exists
           assertz(exists(Card)),
           ( Type = weapon  -> assertz(weapon(Card)) ;
             Type = room    -> assertz(room(Card)) ;
-            Type = suspect -> assertz(suspect(Card))) ) ),
-    % prompt for another card
-    loadCards(Type).
+            Type = suspect -> assertz(suspect(Card))),
+            % prompt for another card
+            loadCards(Type) ) ).
+
 
 /*--------------------------------------------------
  *
@@ -314,8 +333,8 @@ othersShown(Turn, Weapon, Room, Suspect) :-
       CardCount = 3 -> assertz(holds(Turn, Weapon)), 
                        assertz(holds(Turn, Room)), 
                        assertz(holds(Turn, Suspect)); 
-      write('Please enter a valid number of cards and player!'), nl, nl ), 
-      othersShown(Weapon, Room, Suspect).
+      write('Please enter a valid number of cards and player!'), nl, nl, 
+      othersShown(Turn, Weapon, Room, Suspect) ).
 
 % if no shown cards, then nobody holds any of the cards
 othersNotShown(Weapon, Room, Suspect) :-
@@ -358,7 +377,7 @@ othersAccuseResult(Turn, Weapon, Room, Suspect) :-
  *------------------------------------------------*/
 
 getHints :-
-    accusableHint; 
+    accusableHint, 
     nextSuggestionHint.
 
 % give accusable set if available

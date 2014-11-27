@@ -32,16 +32,16 @@ room(theatre).
 room('living room').
 room(observatory).
 room(hall).
-room('guest house').
-room('dining room').
+room(guesthouse).
+room(diningroom).
 
 
-suspect('Colonel Mustard').
-suspect('Miss Scarlet').
-suspect('Professor Plum').
-suspect('Mr. Green').
-suspect('Mrs. White').
-suspect('Mrs. Peacock').
+suspect(mustard).
+suspect(scarlet).
+suspect(plum).
+suspect(green).
+suspect(white).
+suspect(peacock).
 
 exists(knife).
 exists(candlestick).
@@ -54,15 +54,15 @@ exists(kitchen).
 exists(patio).
 exists(spa).
 exists(theatre).
-exists('living room').
+exists(livingroom).
 exists(observatory).
 exists(hall).
-exists('guest house').
-exists('dining room').
+exists(guesthouse).
+exists(diningroom).
 
-exists('Colonel Mustard').
-exists('Miss Scarlet').
-exists('Professor Plum').
-exists('Mr. Green').
-exists('Mrs. White').
-exists('Mrs. Peacock').
+exists(mustard).
+exists(scarlet).
+exists(plum).
+exists(green).
+exists(white).
+exists(peacock).
