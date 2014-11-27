@@ -213,13 +213,13 @@ myFeedback(Weapon, Room, Suspect) :-
       myFeedback(Weapon, Room, Suspect) ).
 
 myShown(Weapon, Room, Suspect) :-
-    write('-> Type a card name or \'f\' if you\'re finished:'), nl, nl,
-    read(Card), 
+    write('-> Player who showed you the card or \'f\' to finish:'), nl, nl,
+    read(Turn), 
       % assert that if suggested cards that have not been shown
       % are not already held, then nobody holds them
-    ( Card = f -> myNotShown(Weapon, Room, Suspect), true; 
-      write('-> Player who showed you the card:'), nl, nl,
-      read(Turn), 
+    ( Turn = f -> myNotShown(Weapon, Room, Suspect), true; 
+      write('-> Name of the card:'), nl, nl,
+      read(Card), 
       % save the fact that card is held
       assertz(holds(Turn, Card)),
       myShown(Weapon, Room, Suspect) ).
@@ -239,7 +239,21 @@ myAccuse :-
     write('-> Accuse a room:'), nl, nl,
     read(Room),
     write('-> Accuse a suspect:'), nl, nl,
-    read(Suspect).
+    read(Suspect),
+    myAccuseResult(Weapon, Room, Suspect).
+
+myAccuseResult(Weapon, Room, Suspect) :-
+    write('Was '), 
+    write(Weapon), write(', '), 
+    write(Room), write(', and '),
+    write(Suspect), write(' the solution to the case?'), nl,
+    write('[y] yes'), nl,
+    write('[n] no'), nl, nl,
+    read(Response),
+    ( Response = y -> endGame(win);
+      Response = n -> endGame(lose);
+      write('Please choose a valid option!'), nl, nl, 
+      myAccuseResult(Weapon, Room, Suspect) ).
 
 /*--------------------------------------------------
  *
@@ -275,18 +289,18 @@ othersFeedback(Turn, Weapon, Room, Suspect) :-
     write('[n] Nope'), nl, nl,
     read(Response), 
     ( Response = y -> othersShown(Turn, Weapon, Room, Suspect);
-      Response = n -> othersNotShown(Turn, Weapon, Room, Suspect);
+      Response = n -> othersNotShown(Weapon, Room, Suspect);
       write('Please choose a valid option!'), nl, nl, 
       othersFeedback(Turn, Weapon, Room, Suspect) ).
 
 othersShown(Turn, Weapon, Room, Suspect) :-
-    write('-> Type the number of cards shown or \'f\' to finish:'), nl, nl,
-    read(CardCount), 
+    write('-> -> Player who showed the card or \'f\' to finish:'), nl, nl,
+    read(Turn), 
     % finish
-    CardCount = f -> othersNotShown(Turn, Weapon, Room, Suspect);
+    Turn = f -> othersNotShown(Weapon, Room, Suspect);
     % continue
-    write('-> Player who showed the card:'), nl, nl,
-    read(Turn),
+    write('-> Number of cards shown:'), nl, nl,
+    read(CardCount),
     ( CardCount = 1 -> assertz(holdsOneOf(Turn, [Weapon, Room, Suspect]));
       CardCount = 2 -> assertz(holdsTwoOf(Turn, [Weapon, Room, Suspect]));
       % if 3 cards shown, player holds all 3 cards
@@ -294,10 +308,10 @@ othersShown(Turn, Weapon, Room, Suspect) :-
                        assertz(holds(Turn, Room)), 
                        assertz(holds(Turn, Suspect)); 
       write('Please enter a valid number of cards and player!'), nl, nl ), 
-      othersShown(Turn, Weapon, Room, Suspect).
+      othersShown(Weapon, Room, Suspect).
 
 % if no shown cards, then nobody holds any of the cards
-othersNotShown(Turn, Weapon, Room, Suspect) :-
+othersNotShown(Weapon, Room, Suspect) :-
     % if a card is not shown, and it is not held already, 
     % then nobody holds it
     % TODO!!!
@@ -311,7 +325,22 @@ othersAccuse(Turn) :-
     write('-> Player '), write(Turn), write('\'s accused room:'), nl, nl,
     read(Room),
     write('-> Player '), write(Turn), write('\'s accused suspect:'), nl, nl,
-    read(Suspect).
+    read(Suspect),
+    othersAccuseResult(Turn, Weapon, Room, Suspect).
+
+othersAccuseResult(Turn, Weapon, Room, Suspect) :-
+    write('Was '), 
+    write(Weapon), write(', '), 
+    write(Room), write(', and '),
+    write(Suspect), write(' the solution to the case?'), nl,
+    write('[y] yes'), nl,
+    write('[n] no'), nl, nl,
+    read(Response),
+    ( Response = y -> endGame(lose);
+      % TODO: possibly infer knowledge from an opponent accusation
+      Response = n -> true;
+      write('Please choose a valid option!'), nl, nl, 
+      othersAccuseResult(Turn, Weapon, Room, Suspect) ).
 
 /*--------------------------------------------------
  *
@@ -320,8 +349,10 @@ othersAccuse(Turn) :-
  *------------------------------------------------*/
 
 getHints :-
-    accusableHint, nextSuggestionHint.
+    accusableHint; 
+    nextSuggestionHint.
 
+% give accusable set if available
 accusableHint :-
     ( accusableSet(Weapon, Room, Suspect) -> 
         write('Hey, I think you have enough information to make an accusation!'), nl, 
@@ -330,8 +361,16 @@ accusableHint :-
         write('-> Suspect: '), write(Suspect), write(','), nl, nl, true;
      true ).
 
+
 nextSuggestionHint :-
-    write('TODO'), nl, nl.
+    ( suggestableSet(Weapon, Room, Suspect) ->
+        write('You should suggest the following if possible:'), nl,
+        write('-> Weapon: '), write(Weapon), write(','), nl,
+        write('-> Room: '), write(Room), write(','), nl,
+        write('-> Suspect: '), write(Suspect), write(','), nl, nl;
+    % not enough information to make a suggestion
+    write('I can\'t think of a suggestion right now, sorry!') ).
+
 
 
 /*--------------------------------------------------
@@ -390,6 +429,17 @@ getCantHoldListing :-
     read(Turn), 
     ( validTurn(Turn) -> forall(cantHold(Turn, Card), writeln(Card)), nl, nl;
       write('Please enter a valid option!'), nl, nl, getCardListing ).
+
+/*--------------------------------------------------
+ *
+ * Game duration: end the game
+ *
+ *------------------------------------------------*/
+
+ endGame(State) :-
+    State = win -> write('You\'ve won thanks to my smarts!'), halt;
+    State = lose -> write('Aw, better luck next time!'), halt;
+    write('Error!').
 
 /*--------------------------------------------------
  *
