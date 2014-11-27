@@ -61,3 +61,9 @@ cantHold(Turn, Card) :-
  	holds(Turn, Card);
  	holdsOneOf(Turn, Cards), member(Card, Cards);
  	holdsTwoOf(Turn, Cards), member(Card, Cards).
+
+/*--------------------------------------------------
+ *
+ * nobody holds inference rules
+ *
+ *------------------------------------------------*/

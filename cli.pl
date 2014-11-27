@@ -131,9 +131,6 @@ getTurn :-
       % otherwise prompt for valid turn 
       write('Please enter a valid turn number.'), nl, nl, getTurn ).
 
-validTurn(Turn) :-
-    (Turn > 0), players(N), (Turn =< N).
-
 
 /*--------------------------------------------------
  *
@@ -318,7 +315,7 @@ othersAccuse(Turn) :-
 
 /*--------------------------------------------------
  *
- * Game duration: help commands
+ * Game duration: get hints commands
  *
  *------------------------------------------------*/
 
@@ -336,14 +333,72 @@ accusableHint :-
 nextSuggestionHint :-
     write('TODO'), nl, nl.
 
+
+/*--------------------------------------------------
+ *
+ * Game duration: retrieve from database commands
+ *
+ *------------------------------------------------*/
+
 getData :-
-    write('TODO'), nl, nl.
+    write('What would you like to know from the database?'), nl,
+    write('[c] Cards that are in this game'), nl,
+    write('[e] Envelope cards known so far'), nl,
+    write('[h] Held cards of a player known so far'), nl,
+    write('[m] Maybe held cards of a player known so far'), nl,
+    write('[n] Not held cards of a player known so far'), nl, 
+    write('[f] Finished for now'), nl, nl,
+    read(Action), 
+    ( Action = f -> true;
+      Action = c -> getCardListing;
+      Action = e -> getNobodyHoldsListing;
+      Action = h -> getHoldsListing;
+      Action = m -> getMaybeHoldsListing;
+      Action = n -> getCantHoldListing;
+      write('Please choose a valid option!'), nl, nl, getData ).
+
+getCardListing :-
+    write('What type of cards should I list?'), nl,
+    write('[w] Weapon Cards'), nl,
+    write('[r] Room Cards'), nl,
+    write('[s] Suspect Cards'), nl,
+    write('[f] Finished for now'), nl, nl,
+    read(Action),
+    ( Action = f -> true;
+      Action = w -> forall(weapon(Card), writeln(Card)), nl, nl;
+      Action = r -> forall(room(Card), writeln(Card)), nl, nl;
+      Action = s -> forall(suspect(Card), writeln(Card)), nl, nl;
+      write('Please choose a valid option!'), nl, nl, getCardListing ).
+
+getNobodyHoldsListing :-
+    forall(nobodyHolds(Card), writeln(Card)), nl, nl.
+
+getHoldsListing :-
+    write('Which player would you like to know about?'), nl,
+    read(Turn), 
+    ( validTurn(Turn) -> forall(holds(Turn, Card), writeln(Card)), nl, nl;
+      write('Please enter a valid option!'), nl, nl, getCardListing ).
+
+getMaybeHoldsListing :-
+    write('Which player would you like to know about?'), nl,
+    read(Turn), 
+    ( validTurn(Turn) -> forall(maybeHolds(Turn, Card), writeln(Card)), nl, nl;
+      write('Please enter a valid option!'), nl, nl, getCardListing ).
+
+getCantHoldListing :-
+    write('Which player would you like to know about?'), nl,
+    read(Turn), 
+    ( validTurn(Turn) -> forall(cantHold(Turn, Card), writeln(Card)), nl, nl;
+      write('Please enter a valid option!'), nl, nl, getCardListing ).
 
 /*--------------------------------------------------
  *
  * Helpers
  *
  *------------------------------------------------*/
+
+validTurn(Turn) :-
+    (Turn > 0), players(N), (Turn =< N).
 
 % check that a card exists and is of the right type
 checkValid(Type, Card) :-
