@@ -14,12 +14,6 @@ weapon(rope).
 weapon(bat).
 weapon(axe).
 
-exists(knife).
-exists(candlestick).
-exists(pistol).
-exists(rope).
-exists(bat).
-exists(axe).
 
 room(kitchen).
 room(patio).
@@ -31,6 +25,21 @@ room(hall).
 room('guest house').
 room('dining room').
 
+
+suspect('Colonel Mustard').
+suspect('Miss Scarlet').
+suspect('Professor Plum').
+suspect('Mr. Green').
+suspect('Mrs. White').
+suspect('Mrs. Peacock').
+
+exists(knife).
+exists(candlestick).
+exists(pistol).
+exists(rope).
+exists(bat).
+exists(axe).
+
 exists(kitchen).
 exists(patio).
 exists(spa).
@@ -40,13 +49,6 @@ exists(observatory).
 exists(hall).
 exists('guest house').
 exists('dining room').
-
-suspect('Colonel Mustard').
-suspect('Miss Scarlet').
-suspect('Professor Plum').
-suspect('Mr. Green').
-suspect('Mrs. White').
-suspect('Mrs. Peacock').
 
 exists('Colonel Mustard').
 exists('Miss Scarlet').

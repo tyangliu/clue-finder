@@ -1,39 +1,70 @@
+/*--------------------------------------------------
+ *
+ * Macros
+ *
+ *------------------------------------------------*/
 
-holds(P,CardC) :-
-	holdsOneOf(P,CardA,CardB,CardC), 
-	cantHold(P,CardB), 
-	cantHold(P,CardA).
+nobodyElseHolds(Card) :-
+	write('test'), nl, nl.
 
-holds(P,CardB) :-
-	holdsOneOf(P,CardA,CardB,CardC),
-	cantHold(P, CardA),
-	cantHold(P,CardC).
+nobodyElseHolds(P, Card) :-
+	write('test'), nl, nl.
 
-holds(P,CardA) :-
-	holdsOneOf(P,CardA,CardB,CardC),
-	cantHold(P, CardB),
-	cantHold(P, CardC).
+nobodyElseHolds([P], Card) :-
+	write('test'), nl, nl.
 
-holds(P,CardA) :-
-	holdsTwoOf(P,CardA,CardB,CardC),
-	cantHold(P,CardC).
 
-holds(P,CardB) :-
-	holdsTwoOf(P,CardA,CardB,CardC),
-	cantHold(P,CardC).
+/*--------------------------------------------------
+ *
+ * holds inference rules
+ *
+ *------------------------------------------------*/
 
-holds(P,CardA) :-
-	holdsTwoOf(P,CardA,CardB,CardC),
-	cantHold(P,CardB).
+holds(Turn,CardC) :-
+	holdsOneOf(Turn,CardA,CardB,CardC), 
+	cantHold(Turn,CardB), 
+	cantHold(Turn,CardA).
 
-holds(P,CardC) :-
-	holdsTwoOf(P,CardA,CardB,CardC),
-	cantHold(P,CardB).
+holds(Turn,CardB) :-
+	holdsOneOf(Turn,CardA,CardB,CardC),
+	cantHold(Turn,CardA),
+	cantHold(Turn,CardC).
 
-holds(P,CardB) :-
-	holdsTwoOf(P,CardA,CardB,CardC),
-	cantHold(P,CardA).
+holds(Turn,CardA) :-
+	holdsOneOf(Turn,CardA,CardB,CardC),
+	cantHold(Turn,CardB),
+	cantHold(Turn,CardC).
 
-holds(P,CardC) :-
-	holdsTwoOf(P,CardA,CardB,CardC),
-	cantHold(P,CardA)
+holds(Turn,CardA) :-
+	holdsTwoOf(Turn,CardA,CardB,CardC),
+	cantHold(Turn,CardC).
+
+holds(Turn,CardB) :-
+	holdsTwoOf(Turn,CardA,CardB,CardC),
+	cantHold(Turn,CardC).
+
+holds(Turn,CardA) :-
+	holdsTwoOf(Turn,CardA,CardB,CardC),
+	cantHold(Turn,CardB).
+
+holds(Turn,CardC) :-
+	holdsTwoOf(Turn,CardA,CardB,CardC),
+	cantHold(Turn,CardB).
+
+holds(Turn,CardB) :-
+	holdsTwoOf(Turn,CardA,CardB,CardC),
+	cantHold(Turn,CardA).
+
+holds(Turn,CardC) :-
+	holdsTwoOf(Turn,CardA,CardB,CardC),
+	cantHold(Turn,CardA).
+
+/*--------------------------------------------------
+ *
+ * cantHold inference rules
+ *
+ *------------------------------------------------*/
+
+% a player cant hold a card if somebody else holds it
+cantHold(Turn, Card) :-
+	holds(Turn2, Card), Turn2 \= Turn.

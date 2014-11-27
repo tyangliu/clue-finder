@@ -14,13 +14,6 @@ weapon(rope).
 weapon('lead pipe').
 weapon(wrench).
 
-exists(knife).
-exists(candlestick).
-exists(revolver).
-exists(rope).
-exists('lead pipe').
-exists(wrench).
-
 room(kitchen).
 room(ballroom).
 room(conservatory).
@@ -30,6 +23,21 @@ room(study).
 room(hall).
 room(lounge).
 room('dining room').
+
+suspect('Colonel Mustard').
+suspect('Miss Scarlet').
+suspect('Professor Plum').
+suspect('Mr. Green').
+suspect('Mrs. White').
+suspect('Mrs. Peacock').
+
+exists(knife).
+exists(candlestick).
+exists(revolver).
+exists(rope).
+exists('lead pipe').
+exists(wrench).
+
 
 exists(kitchen).
 exists(ballroom).
@@ -41,12 +49,6 @@ exists(hall).
 exists(lounge).
 exists('dining room').
 
-suspect('Colonel Mustard').
-suspect('Miss Scarlet').
-suspect('Professor Plum').
-suspect('Mr. Green').
-suspect('Mrs. White').
-suspect('Mrs. Peacock').
 
 exists('Colonel Mustard').
 exists('Miss Scarlet').
