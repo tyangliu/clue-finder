@@ -1,9 +1,17 @@
-:- use_module(presets,[loadOldVersion/0, loadNewVersion/0]). 
-:- dynamic suspect/1.
-:- dynamic room/1.
-:- dynamic weapon/1.
-:- dynamic players/1.
-:- dynamic myTurn/1.
+
+:- abolish(suspect/1).
+:- abolish(room/1).
+:- abolish(weapon/1).
+:- abolish(players/1).
+:- abolish(myTurn/1).
+:- abolish(exists/1).
+
+:- dynamic(suspect/1).
+:- dynamic(room/1).
+:- dynamic(weapon/1).
+:- dynamic(players/1).
+:- dynamic(myTurn/1).
+:- dynamic(exists/1).
 
 /*-------------------------------------------------
  *
@@ -41,7 +49,7 @@ getVersion :-
 
 loadVersion(Version) :-
     % load old version preset
-    Version = o -> loadOldVersion;
+    Version = o -> [presets];
     % load new version preset
     Version = n -> loadNewVersion;
     % ask user to set the cards of the game
@@ -87,8 +95,8 @@ loadCards(Type) :-
 getNumPlayers :-
     write('How many players are there?'), nl, nl,
     read(NumPlayers),
-    ( NumPlayers < 2 -> write('Number of players must be between 2 and 6.'), getNumPlayers;
-      NumPlayers > 6 -> write('Number of players must be between 2 and 6.'), getNumPlayers;
+    ( NumPlayers < 2 -> write('Number of players must be between 2 and 6.'), nl, nl, getNumPlayers;
+      NumPlayers > 6 -> write('Number of players must be between 2 and 6.'), nl, nl, getNumPlayers;
       asserta(players(NumPlayers)) ).
 
 /*--------------------------------------------------
@@ -103,7 +111,7 @@ getTurn :-
     % store Turn if > 0 and < number of players
     ( validTurn(Turn) -> asserta(myTurn(Turn)); 
     % otherwise prompt for valid turn 
-      write('Please enter a valid turn number.'), getTurn ).
+      write('Please enter a valid turn number.'), nl, nl, getTurn ).
 
 validTurn(Turn) :-
     (Turn > 0), players(N), (Turn =< N).
@@ -119,11 +127,13 @@ getPlayerHand :-
     write('-> Type a card name or \'f\' when you\'re finished:'), nl, nl,
     read(Card),
     % finished entering cards, move on
-    Card = f -> true;
-    % verify the card and remember it
-    write('TODO'), nl, nl.
+    ( Card = f -> true;
+    % if card is valid, remember it
+    exists(Card) -> myTurn(T), assertz(holds(T, Card)), getPlayerHand;
+    % otherwise show error and prompt for card
+    write('Please type a valid card name.'), nl, nl, getPlayerHand ).
     % ask for another card
-
+ 
 /*--------------------------------------------------
  *
  * Game duration
