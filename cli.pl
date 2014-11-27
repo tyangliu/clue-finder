@@ -28,7 +28,7 @@
 :- dynamic(myTurn/1).
 :- dynamic(exists/1).
 :- dynamic(holds/2).
-:- dyanmic(skip/1).
+:- dynamic(skip/1).
 
 %  load logic file
 :- [logic].

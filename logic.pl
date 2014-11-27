@@ -21,11 +21,11 @@
 
 % if nobody holds weapon, room, and suspect, then the set is accusable
 accusableSet(Weapon, Room, Suspect) :-
-	nobodyHolds(Weapon), nobodyHolds(Room), nobodyHolds(Suspect).
+	weapon(Weapon), nobodyHolds(Weapon), room(Room), nobodyHolds(Room), suspect(Suspect), nobodyHolds(Suspect).
 
 % set is suggestable if all component cards are suggestable
 suggestableSet(Weapon, Room, Suspect) :-
-	suggestableCard(Weapon), suggestableCard(Room), suggestableCard(Suspect).
+	weapon(Weapon), suggestableCard(Weapon), room(Room), suggestableCard(Room), suspect(Suspect), suggestableCard(Suspect).
 
 /*--------------------------------------------------
  *
