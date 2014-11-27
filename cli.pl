@@ -19,6 +19,7 @@
 :- abolish(myTurn/1).
 :- abolish(exists/1).
 :- abolish(holds/2).
+:- abolish(skip/1).
 
 :- dynamic(suspect/1).
 :- dynamic(room/1).
@@ -27,6 +28,7 @@
 :- dynamic(myTurn/1).
 :- dynamic(exists/1).
 :- dynamic(holds/2).
+:- dyanmic(skip/1).
 
 %  load logic file
 :- [logic].
@@ -157,14 +159,16 @@ getPlayerHand :-
 game(Turn) :-
     % user's turn
     ( myTurn(Turn) -> write('Your move! What would you like to do?'), nl, 
-        myMove;
+        myMove, switchTurns(Turn, NextTurn), game(NextTurn);
     % another player's turn
-       write('It is player '), 
-       write(Turn), 
-       write('\'s move. Let me know what happened!'), nl, 
-       othersMove(Turn) ), 
-    % move to the next turn
-    switchTurns(Turn, NextTurn), game(NextTurn).
+    % skip turn if player already lost
+    ( skip(Turn) -> switchTurns(Turn, NextTurn), game(NextTurn);
+      write('It is player '), 
+      write(Turn), 
+      write('\'s move. Let me know what happened!'), nl, 
+      othersMove(Turn), 
+      % move to the next turn
+      switchTurns(Turn, NextTurn), game(NextTurn) ) ).
 
 % reset turn to 1 after last player finishes turn
 switchTurns(Turn, NextTurn) :-
@@ -212,6 +216,7 @@ myFeedback(Weapon, Room, Suspect) :-
       write('Please choose a valid option!'), nl, nl, 
       myFeedback(Weapon, Room, Suspect) ).
 
+% respond to and interpret cards that are shown by other players
 myShown(Weapon, Room, Suspect) :-
     write('-> Player who showed you the card or \'f\' to finish:'), nl, nl,
     read(Turn), 
@@ -224,7 +229,7 @@ myShown(Weapon, Room, Suspect) :-
       assertz(holds(Turn, Card)),
       myShown(Weapon, Room, Suspect) ).
 
-% if no shown cards, then nobody holds any of the cards
+% interpret the cards not shown by other players
 myNotShown(Weapon, Room, Suspect) :-
       % if a card is not shown, and it is not held already, 
       % then nobody holds it
@@ -232,7 +237,7 @@ myNotShown(Weapon, Room, Suspect) :-
     not(holds(_, Room))    -> assertz(nobodyHolds(Room));
     not(holds(_, Suspect)) -> assertz(nobodyHolds(Suspect)).
 
-% TODO
+% make an accusation: either win or lose, no going back
 myAccuse :-
     write('-> Accuse a weapon:'), nl, nl,
     read(Weapon),
@@ -242,6 +247,7 @@ myAccuse :-
     read(Suspect),
     myAccuseResult(Weapon, Room, Suspect).
 
+% respond to whether the accusation was correct or incorrect.
 myAccuseResult(Weapon, Room, Suspect) :-
     write('Was '), 
     write(Weapon), write(', '), 
@@ -274,6 +280,7 @@ othersMove(Turn) :-
       Action = d -> getData, othersMove(Turn);
       write('Please choose a valid option!'), nl, nl, othersMove(Turn) ).
 
+% get another player's suggestion
 othersSuggest(Turn) :-
     write('Player '), write(Turn), write('\'s suggested weapon:'), nl, nl,
     read(Weapon),
@@ -338,7 +345,9 @@ othersAccuseResult(Turn, Weapon, Room, Suspect) :-
     read(Response),
     ( Response = y -> endGame(lose);
       % TODO: possibly infer knowledge from an opponent accusation
-      Response = n -> true;
+      % continue gameplay if guess was incorrect, 
+      % skipping the losing player's turn
+      Response = n -> assertz(skip(Turn));
       write('Please choose a valid option!'), nl, nl, 
       othersAccuseResult(Turn, Weapon, Room, Suspect) ).
 
@@ -362,6 +371,7 @@ accusableHint :-
      true ).
 
 
+% get suggestion hints based on suggestable ranking in logic.pl
 nextSuggestionHint :-
     ( suggestableSet(Weapon, Room, Suspect) ->
         write('You should suggest the following if possible:'), nl,
@@ -447,6 +457,7 @@ getCantHoldListing :-
  *
  *------------------------------------------------*/
 
+% check that turn number is greater than 0 and less than numPlayers
 validTurn(Turn) :-
     (Turn > 0), players(N), (Turn =< N).
 
