@@ -15,7 +15,7 @@
 
 /*--------------------------------------------------
  *
- * general inference rules
+ * card set inference rules
  *
  *------------------------------------------------*/
 
@@ -27,13 +27,34 @@ accusableSet(Weapon, Room, Suspect) :-
 suggestableSet(Weapon, Room, Suspect) :-
 	suggestableCard(Weapon), suggestableCard(Room), suggestableCard(Suspect).
 
-% top priority suggestable card - a player holds two of three cards
-% AFTER SUGGESTION: up to three confirms
+/*--------------------------------------------------
+ *
+ * suggestable card inference rules
+ *
+ *------------------------------------------------*/
+
+% ----- suggestableCard rules are listed top-to-bottom in order of priority  ----- %
+
+% a player holds two of three cards, all three unknown
+% AFTER SUGGESTION: up to three confirms (holds or cantHold)
+suggestableCard(Card) :-
+	unconfirmedCard(Card), holdsTwoOf(_, Cards), member(Card, Cards), maplist(unconfirmedCard, Cards).
+
+% a player holds one of three cards, one cantHold already confirmed, 
+% other two unknown
+% AFTER SUGGESTION: up to two confirms (holds or cantHold)
+suggestableCard(Card) :-
+	unconfirmedCard(Card), holdsOneOf(Turn, Cards), member(Card, Cards), 
+	cantHold(Turn, Card2), member(Card2, Cards),
+	unconfirmedCard(Card3), Card3 \= Card, member(Card3, Cards).
+
+% a player holds two of three cards
+% AFTER SUGGESTION: up to three confirms (holds or cantHold)
 suggestableCard(Card) :-
 	unconfirmedCard(Card), holdsTwoOf(_, Cards), member(Card, Cards).
 
-% medium priority suggestable card - a player holds one of three cards
-% AFTER SUGGESTION: up to one confirm, 
+% ma player holds one of three cards
+% AFTER SUGGESTION: up to one confirm (holds or cantHold), 
 %                   one additional top priority suggestable card afterward
 suggestableCard(Card) :-
 	unconfirmedCard(Card), holdsOneOf(_, Cards), member(Card, Cards).
@@ -41,6 +62,12 @@ suggestableCard(Card) :-
 % bottom priority suggestable card - any card not yet confirmed
 suggestableCard(Card) :-
 	unconfirmedCard(Card).
+
+/*--------------------------------------------------
+ *
+ * unconfirmed card inference rules
+ *
+ *------------------------------------------------*/
 
 % card not yet confirmed to be held or in envelope
 unconfirmedCard(Card) :-
