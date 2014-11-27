@@ -1,11 +1,22 @@
 /*-------------------------------------------------
- * Old version game presets
- *------------------------------------------------- 
+ *
+ * Tianyang Liu     47867130      y6x8
+ *
+ * ------------------------------------------------
+ *
+ * Jason Zenan Wu   46823118      d4c8
+ *
+ * ------------------------------------------------
+ *
+ * Clue Finder: Old version game presets
+ *
+ *-------------------------------------------------
  * 
  * loaded into the game if a player selects 
  * old version for card set
  *
  *-----------------------------------------------*/
+
 
 weapon(knife).
 weapon(candlestick).

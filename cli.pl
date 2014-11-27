@@ -1,3 +1,16 @@
+/*-------------------------------------------------
+ *
+ * Tianyang Liu     47867130      y6x8
+ *
+ * ------------------------------------------------
+ *
+ * Jason Zenan Wu   46823118      d4c8
+ *
+ * ------------------------------------------------
+ *
+ * Clue Finder: Command Line Interface
+ *
+ *-----------------------------------------------*/
 
 :- abolish(suspect/1).
 :- abolish(room/1).
@@ -270,27 +283,30 @@ othersFeedback(Turn, Weapon, Room, Suspect) :-
       othersFeedback(Turn, Weapon, Room, Suspect) ).
 
 othersShown(Turn, Weapon, Room, Suspect) :-
-    write('-> Number of cards shown:'), nl, nl,
+    write('-> Type the number of cards shown or \'f\' to finish:'), nl, nl,
     read(CardCount), 
+    % finish
+    CardCount = f -> othersNotShown(Turn, Weapon, Room, Suspect);
+    % continue
     write('-> Player who showed the card:'), nl, nl,
     read(Turn),
-    ( CardCount = 1 -> assertz(holdsOneOf(Turn, Weapon, Room, Suspect));
-      CardCount = 2 -> assertz(holdsTwoOf(Turn, Weapon, Room, Suspect));
+    ( CardCount = 1 -> assertz(holdsOneOf(Turn, [Weapon, Room, Suspect]));
+      CardCount = 2 -> assertz(holdsTwoOf(Turn, [Weapon, Room, Suspect]));
       % if 3 cards shown, player holds all 3 cards
       CardCount = 3 -> assertz(holds(Turn, Weapon)), 
                        assertz(holds(Turn, Room)), 
                        assertz(holds(Turn, Suspect)); 
-      write('Please enter a valid number of cards and player!'), nl, nl, 
-      othersShown(Turn, Weapon, Room, Suspect) ).
+      write('Please enter a valid number of cards and player!'), nl, nl ), 
+      othersShown(Turn, Weapon, Room, Suspect).
 
 % if no shown cards, then nobody holds any of the cards
 othersNotShown(Turn, Weapon, Room, Suspect) :-
-      % if a card is not shown, and it is not held already, 
-      % then nobody holds it
-    not(holds(_, Weapon))  -> assertz(nobodyHolds(Weapon));
-    not(holds(_, Room))    -> assertz(nobodyHolds(Room));
-    not(holds(_, Suspect)) -> assertz(nobodyHolds(Suspect)).
-
+    % if a card is not shown, and it is not held already, 
+    % then nobody holds it
+    % TODO!!!
+    not(maybeHolds(_, Weapon))  -> assertz(nobodyHolds(Weapon));
+    not(maybeHolds(_, Room))    -> assertz(nobodyHolds(Room));
+    not(maybeHolds(_, Suspect)) -> assertz(nobodyHolds(Suspect)).
 
 othersAccuse(Turn) :-
     write('-> Player '), write(Turn), write('\'s accused weapon:'), nl, nl,
@@ -307,6 +323,17 @@ othersAccuse(Turn) :-
  *------------------------------------------------*/
 
 getHints :-
+    accusableHint, nextSuggestionHint.
+
+accusableHint :-
+    ( accusableSet(Weapon, Room, Suspect) -> 
+        write('Hey, I think you have enough information to make an accusation!'), nl, 
+        write('-> Weapon: '), write(Weapon), write(','), nl,
+        write('-> Room: '), write(Room), write(','), nl,
+        write('-> Suspect: '), write(Suspect), write(','), nl, nl, true;
+     true ).
+
+nextSuggestionHint :-
     write('TODO'), nl, nl.
 
 getData :-

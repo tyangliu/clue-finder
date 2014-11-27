@@ -1,18 +1,27 @@
+/*-------------------------------------------------
+ *
+ * Tianyang Liu     47867130      y6x8
+ *
+ * ------------------------------------------------
+ *
+ * Jason Zenan Wu   46823118      d4c8
+ *
+ * ------------------------------------------------
+ *
+ * Clue Finder: Logical Inference Rules
+ *
+ *-----------------------------------------------*/
+
+
 /*--------------------------------------------------
  *
- * Macros
+ * general inference rules
  *
  *------------------------------------------------*/
 
-nobodyElseHolds(Card) :-
-	write('test'), nl, nl.
-
-nobodyElseHolds(P, Card) :-
-	write('test'), nl, nl.
-
-nobodyElseHolds([P], Card) :-
-	write('test'), nl, nl.
-
+% if nobody holds weapon, room, and suspect, then the set is accusable
+accusableSet(Weapon, Room, Suspect) :-
+	nobodyHolds(Weapon), nobodyHolds(Room), nobodyHolds(Suspect).
 
 /*--------------------------------------------------
  *
@@ -20,44 +29,16 @@ nobodyElseHolds([P], Card) :-
  *
  *------------------------------------------------*/
 
-holds(Turn,CardC) :-
-	holdsOneOf(Turn,CardA,CardB,CardC), 
-	cantHold(Turn,CardB), 
-	cantHold(Turn,CardA).
+% infer holds from one holdsOneOf and two cantHolds
+holds(Turn,Card) :-
+	holdsOneOf(Turn,Cards), member(Card, Cards),
+	cantHold(Turn,Card2), member(Card2, Cards), Card2 \= Card,
+	cantHold(Turn,Card3), member(Card3, Cards), Card3 \= Card2, Card3 \= Card.
 
-holds(Turn,CardB) :-
-	holdsOneOf(Turn,CardA,CardB,CardC),
-	cantHold(Turn,CardA),
-	cantHold(Turn,CardC).
-
-holds(Turn,CardA) :-
-	holdsOneOf(Turn,CardA,CardB,CardC),
-	cantHold(Turn,CardB),
-	cantHold(Turn,CardC).
-
-holds(Turn,CardA) :-
-	holdsTwoOf(Turn,CardA,CardB,CardC),
-	cantHold(Turn,CardC).
-
-holds(Turn,CardB) :-
-	holdsTwoOf(Turn,CardA,CardB,CardC),
-	cantHold(Turn,CardC).
-
-holds(Turn,CardA) :-
-	holdsTwoOf(Turn,CardA,CardB,CardC),
-	cantHold(Turn,CardB).
-
-holds(Turn,CardC) :-
-	holdsTwoOf(Turn,CardA,CardB,CardC),
-	cantHold(Turn,CardB).
-
-holds(Turn,CardB) :-
-	holdsTwoOf(Turn,CardA,CardB,CardC),
-	cantHold(Turn,CardA).
-
-holds(Turn,CardC) :-
-	holdsTwoOf(Turn,CardA,CardB,CardC),
-	cantHold(Turn,CardA).
+% infer holds from one holdsTwoOf and one cantHold
+holds(Turn,Card) :-
+	holdsTwoOf(Turn,Cards), member(Card, Cards),
+	cantHold(Turn,Card2), member(Card2, Cards), Card2 \= Card.
 
 /*--------------------------------------------------
  *
@@ -68,3 +49,15 @@ holds(Turn,CardC) :-
 % a player cant hold a card if somebody else holds it
 cantHold(Turn, Card) :-
 	holds(Turn2, Card), Turn2 \= Turn.
+
+
+/*--------------------------------------------------
+ *
+ * potentially holds inference rules
+ *
+ *------------------------------------------------*/
+
+ maybeHolds(Turn, Card) :-
+ 	holds(Turn, Card);
+ 	holdsOneOf(Turn, Cards), member(Card, Cards);
+ 	holdsTwoOf(Turn, Cards), member(Card, Cards).
