@@ -1,49 +1,55 @@
 :-  module(presets,[loadOldVersion/0, loadNewVersion/0]). 
 
 loadOldVersion :-
-    assert(weapon(knife)),
-    assert(weapon(candlestick)),
-    assert(weapon(revolver)),
-    assert(weapon(rope)),
-    assert(weapon('lead pipe')),
-    assert(weapon(wrench)),
+    % load preset weapons
+    assertz(weapon(knife)),
+    assertz(weapon(candlestick)),
+    assertz(weapon(revolver)),
+    assertz(weapon(rope)),
+    assertz(weapon('lead pipe')),
+    assertz(weapon(wrench)),
 
-    assert(room(kitchen)),
-    assert(room(ballroom)),
-    assert(room(conservatory)),
-    assert(room('billiard room')),
-    assert(room(library)),
-    assert(room(study)),
-    assert(room(hall)),
-    assert(room(lounge)),
-    assert(room('dining room')),
+    % load preset rooms
+    assertz(room(kitchen)),
+    assertz(room(ballroom)),
+    assertz(room(conservatory)),
+    assertz(room('billiard room')),
+    assertz(room(library)),
+    assertz(room(study)),
+    assertz(room(hall)),
+    assertz(room(lounge)),
+    assertz(room('dining room')),
 
+    % load preset suspects
     loadDefaultSuspects.
 
 loadNewVersion :-
-    assert(weapon(knife)),
-    assert(weapon(candlestick)),
-    assert(weapon(pistol)),
-    assert(weapon(rope)),
-    assert(weapon(bat)),
-    assert(weapon(axe)),
+    % load preset weapons
+    assertz(weapon(knife)),
+    assertz(weapon(candlestick)),
+    assertz(weapon(pistol)),
+    assertz(weapon(rope)),
+    assertz(weapon(bat)),
+    assertz(weapon(axe)),
 
-    assert(room(kitchen)),
-    assert(room(patio)),
-    assert(room(spa)),
-    assert(room(theatre)),
-    assert(room('living room')),
-    assert(room(observatory)),
-    assert(room(hall)),
-    assert(room('guest house')),
-    assert(room('dining room')),
+    % load preset rooms
+    assertz(room(kitchen)),
+    assertz(room(patio)),
+    assertz(room(spa)),
+    assertz(room(theatre)),
+    assertz(room('living room')),
+    assertz(room(observatory)),
+    assertz(room(hall)),
+    assertz(room('guest house')),
+    assertz(room('dining room')),
 
+    % load preset suspects
     loadDefaultSuspects.
 
 loadDefaultSuspects :-
-    assert(suspect('Colonel Mustard')),
-    assert(suspect('Miss Scarlet')),
-    assert(suspect('Professor Plum')),
-    assert(suspect('Mr. Green')),
-    assert(suspect('Mrs. White')),
-    assert(suspect('Mrs. Peacock')).
+    assertz(suspect('Colonel Mustard')),
+    assertz(suspect('Miss Scarlet')),
+    assertz(suspect('Professor Plum')),
+    assertz(suspect('Mr. Green')),
+    assertz(suspect('Mrs. White')),
+    assertz(suspect('Mrs. Peacock')).
