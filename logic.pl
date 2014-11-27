@@ -23,6 +23,29 @@
 accusableSet(Weapon, Room, Suspect) :-
 	nobodyHolds(Weapon), nobodyHolds(Room), nobodyHolds(Suspect).
 
+% set is suggestable if all component cards are suggestable
+suggestableSet(Weapon, Room, Suspect) :-
+	suggestableCard(Weapon), suggestableCard(Room), suggestableCard(Suspect).
+
+% top priority suggestable card - a player holds two of three cards
+% AFTER SUGGESTION: up to three confirms
+suggestableCard(Card) :-
+	unconfirmedCard(Card), holdsTwoOf(_, Cards), member(Card, Cards).
+
+% medium priority suggestable card - a player holds one of three cards
+% AFTER SUGGESTION: up to one confirm, 
+%                   one additional top priority suggestable card afterward
+suggestableCard(Card) :-
+	unconfirmedCard(Card), holdsOneOf(_, Cards), member(Card, Cards).
+
+% bottom priority suggestable card - any card not yet confirmed
+suggestableCard(Card) :-
+	unconfirmedCard(Card).
+
+% card not yet confirmed to be held or in envelope
+unconfirmedCard(Card) :-
+	(not(nobodyHolds(Card))), (not(holds(_, Card))).
+
 /*--------------------------------------------------
  *
  * holds inference rules
@@ -42,17 +65,6 @@ holds(Turn,Card) :-
 
 /*--------------------------------------------------
  *
- * cantHold inference rules
- *
- *------------------------------------------------*/
-
-% a player cant hold a card if somebody else holds it
-cantHold(Turn, Card) :-
-	holds(Turn2, Card), Turn2 \= Turn.
-
-
-/*--------------------------------------------------
- *
  * potentially holds inference rules
  *
  *------------------------------------------------*/
@@ -64,6 +76,23 @@ cantHold(Turn, Card) :-
 
 /*--------------------------------------------------
  *
+ * cantHold inference rules
+ *
+ *------------------------------------------------*/
+
+% a player cant hold a card if somebody else holds it
+cantHold(Turn, Card) :-
+	holds(Turn2, Card), Turn2 \= Turn.
+
+/*--------------------------------------------------
+ *
  * nobody holds inference rules
  *
  *------------------------------------------------*/
+
+% if every player cantHold, then nobodyHolds a card
+ nobodyHolds(Card) :-
+ 	findall(Turn, cantHold(Turn, Card), Turns),
+ 	length(Turns, L), players(NumPlayers), 
+ 	% check that number of cantHolds = NumPlayers
+ 	L = NumPlayers.
