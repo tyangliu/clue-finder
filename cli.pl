@@ -49,9 +49,9 @@ getVersion :-
 
 loadVersion(Version) :-
     % load old version preset
-    Version = o -> [presets];
+    Version = o -> [old-version-presets];
     % load new version preset
-    Version = n -> loadNewVersion;
+    Version = n -> [new-version-presets];
     % ask user to set the cards of the game
     Version = c -> loadCards;
     % if version is not valid, run the prompt again
@@ -76,13 +76,13 @@ loadCards(Type) :-
     write(' name or \'f\' when you\'re finished:'), nl, nl,
     read(Card),
     ( Card = f -> true;
-        % if card is already added, don't add the card
-        (exists(Card) -> write('You already added this card!');
-        % otherwise, save the card and mark as exists
-        assertz(exists(Card)),
-        ( Type = weapon  -> assertz(weapon(Card)) ;
-          Type = room    -> assertz(room(Card)) ;
-          Type = suspect -> assertz(suspect(Card))) ) ),
+          % if card is already added, don't add the card
+        ( exists(Card) -> write('You already added this card!');
+          % otherwise, save the card and mark as exists
+          assertz(exists(Card)),
+          ( Type = weapon  -> assertz(weapon(Card)) ;
+            Type = room    -> assertz(room(Card)) ;
+            Type = suspect -> assertz(suspect(Card))) ) ),
     % prompt for another card
     loadCards(Type).
 
@@ -108,9 +108,9 @@ getNumPlayers :-
 getTurn :-
     write('What turn are you playing on?'), nl, nl,
     read(Turn),
-    % store Turn if > 0 and < number of players
+      % store Turn if > 0 and < number of players
     ( validTurn(Turn) -> asserta(myTurn(Turn)); 
-    % otherwise prompt for valid turn 
+      % otherwise prompt for valid turn 
       write('Please enter a valid turn number.'), nl, nl, getTurn ).
 
 validTurn(Turn) :-
@@ -128,11 +128,10 @@ getPlayerHand :-
     read(Card),
     % finished entering cards, move on
     ( Card = f -> true;
-    % if card is valid, remember it
-    exists(Card) -> myTurn(T), assertz(holds(T, Card)), getPlayerHand;
-    % otherwise show error and prompt for card
-    write('Please type a valid card name.'), nl, nl, getPlayerHand ).
-    % ask for another card
+      % if card is valid, remember it
+      exists(Card) -> myTurn(T), assertz(holds(T, Card)), getPlayerHand;
+      % otherwise show error and prompt for card
+      write('Please type a valid card name.'), nl, nl, getPlayerHand ).
  
 /*--------------------------------------------------
  *
