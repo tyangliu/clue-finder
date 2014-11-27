@@ -35,11 +35,6 @@ suggestableSet(Weapon, Room, Suspect) :-
 
 % ----- suggestableCard rules are listed top-to-bottom in order of priority  ----- %
 
-% a player holds two of three cards, all three unknown
-% AFTER SUGGESTION: up to three confirms (holds or cantHold)
-suggestableCard(Card) :-
-	unconfirmedCard(Card), holdsTwoOf(_, Cards), member(Card, Cards), maplist(unconfirmedCard, Cards).
-
 % a player holds one of three cards, one cantHold already confirmed, 
 % other two unknown
 % AFTER SUGGESTION: up to two confirms (holds or cantHold)
@@ -47,11 +42,6 @@ suggestableCard(Card) :-
 	unconfirmedCard(Card), holdsOneOf(Turn, Cards), member(Card, Cards), 
 	cantHold(Turn, Card2), member(Card2, Cards),
 	unconfirmedCard(Card3), Card3 \= Card, member(Card3, Cards).
-
-% a player holds two of three cards
-% AFTER SUGGESTION: up to three confirms (holds or cantHold)
-suggestableCard(Card) :-
-	unconfirmedCard(Card), holdsTwoOf(_, Cards), member(Card, Cards).
 
 % ma player holds one of three cards
 % AFTER SUGGESTION: up to one confirm (holds or cantHold), 
@@ -85,11 +75,6 @@ holds(Turn,Card) :-
 	cantHold(Turn,Card2), member(Card2, Cards), Card2 \= Card,
 	cantHold(Turn,Card3), member(Card3, Cards), Card3 \= Card2, Card3 \= Card.
 
-% infer holds from one holdsTwoOf and one cantHold
-holds(Turn,Card) :-
-	holdsTwoOf(Turn,Cards), member(Card, Cards),
-	cantHold(Turn,Card2), member(Card2, Cards), Card2 \= Card.
-
 /*--------------------------------------------------
  *
  * potentially holds inference rules
@@ -119,7 +104,7 @@ cantHold(Turn, Card) :-
 
 % if every player cantHold, then nobodyHolds a card
  nobodyHolds(Card) :-
- 	findall(Turn, cantHold(Turn, Card), Turns),
+ 	exists(Card), findall(Turn, cantHold(Turn, Card), Turns),
  	length(Turns, L), players(NumPlayers), 
  	% check that number of cantHolds = NumPlayers
- 	L = NumPlayers.
+ 	L is NumPlayers.
